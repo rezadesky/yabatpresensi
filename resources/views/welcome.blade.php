@@ -187,7 +187,7 @@
         </div>
     </main>
 
-    <!-- Interactive script for toggle password -->
+    <!-- Interactive script for toggle password & PWA Service Worker -->
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const toggleBtn = document.getElementById('togglePasswordBtn');
@@ -202,6 +202,11 @@
                     eyeIcon.classList.toggle('hidden', isPassword);
                     eyeOffIcon.classList.toggle('hidden', !isPassword);
                 });
+            }
+
+            // Register Service Worker
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('/sw.js').catch(() => {});
             }
         });
     </script>
