@@ -1,0 +1,16 @@
+{
+  "name": "YABAT PRESENSI",
+  "short_name": "YABAT PRESENSI",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1e40af",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/logo.webp",
+      "sizes": "512x512 192x192 128x128 64x64",
+      "type": "image/webp"
+    }
+  ]
+}

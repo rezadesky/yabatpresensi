@@ -1,0 +1,6 @@
+---
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/u1807837/public_html/yabatpresensi.stkip-us.ac.id
+    - /bin/mkdir -p $DEPLOYPATH
+    - /bin/rsync -av --delete public/ $DEPLOYPATH/
