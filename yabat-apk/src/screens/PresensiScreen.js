@@ -140,7 +140,17 @@ export default function PresensiScreen() {
       }
 
       const { latitude, longitude, accuracy: posAccuracy } = position.coords;
-      setUserCoords({ latitude, longitude });
+      const isMocked = position.mocked === true || position.coords.isMocked === true;
+
+      // Deteksi Fake GPS langsung di perangkat
+      if (isMocked) {
+        setGpsError('Peringatan Keamanan: Terdeteksi penggunaan Fake GPS / Lokasi Tiruan! Harap nonaktifkan aplikasi Fake GPS.');
+        setUserCoords(null);
+        setCheckingGps(false);
+        return;
+      }
+
+      setUserCoords({ latitude, longitude, isMocked });
       setAccuracy(posAccuracy ? Math.round(posAccuracy) : 10);
 
       // 4. Hitung Jarak ke Unit Institusi
@@ -181,6 +191,10 @@ export default function PresensiScreen() {
       Alert.alert('Periksa Lokasi', 'Silakan periksa titik GPS Anda terlebih dahulu.');
       return;
     }
+    if (userCoords.isMocked) {
+      Alert.alert('Akses Ditolak', 'Aplikasi mendeteksi lokasi tiruan (Fake GPS). Nonaktifkan Mock Location untuk presensi.');
+      return;
+    }
     if (!isWithinRadius) {
       Alert.alert('Di Luar Jangkauan', `Anda berada ${distance}m dari unit kerja. Batas radius adalah ${institution?.radius_meters || 100}m.`);
       return;
@@ -191,6 +205,7 @@ export default function PresensiScreen() {
       const res = await api.post('/mobile/checkin', {
         latitude: userCoords.latitude,
         longitude: userCoords.longitude,
+        is_mocked: userCoords.isMocked || false,
         notes: 'Presensi masuk dari React Native App',
       });
 
@@ -214,6 +229,10 @@ export default function PresensiScreen() {
       Alert.alert('Periksa Lokasi', 'Silakan periksa titik GPS Anda terlebih dahulu.');
       return;
     }
+    if (userCoords.isMocked) {
+      Alert.alert('Akses Ditolak', 'Aplikasi mendeteksi lokasi tiruan (Fake GPS). Nonaktifkan Mock Location untuk presensi.');
+      return;
+    }
     if (!isWithinRadius) {
       Alert.alert('Di Luar Jangkauan', `Anda berada ${distance}m dari unit kerja. Batas radius adalah ${institution?.radius_meters || 100}m.`);
       return;
@@ -224,6 +243,7 @@ export default function PresensiScreen() {
       const res = await api.post('/mobile/checkout', {
         latitude: userCoords.latitude,
         longitude: userCoords.longitude,
+        is_mocked: userCoords.isMocked || false,
       });
 
       if (res.data.success) {

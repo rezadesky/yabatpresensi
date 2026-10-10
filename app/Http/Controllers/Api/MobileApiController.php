@@ -136,7 +136,22 @@ class MobileApiController extends Controller
         ]);
     }
 
-    // 4. API Check-In
+    // Helper: Hitung Jarak Haversine di Server (Meter)
+    protected function calculateHaversine($lat1, $lon1, $lat2, $lon2)
+    {
+        $earthRadius = 6371000; // meter
+        $dLat = deg2rad($lat2 - $lat1);
+        $dLon = deg2rad($lon2 - $lon1);
+
+        $a = sin($dLat / 2) * sin($dLat / 2) +
+            cos(deg2rad($lat1)) * cos(deg2rad($lat2)) *
+            sin($dLon / 2) * sin($dLon / 2);
+
+        $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+        return round($earthRadius * $c);
+    }
+
+    // 4. API Check-In dengan Validasi Geofencing Server & Deteksi Fake GPS
     public function checkIn(Request $request)
     {
         $employee = $this->getEmployee($request);
@@ -145,22 +160,64 @@ class MobileApiController extends Controller
         }
 
         $validated = $request->validate([
-            'latitude' => 'nullable|numeric',
-            'longitude' => 'nullable|numeric',
+            'latitude' => 'required|numeric',
+            'longitude' => 'required|numeric',
             'notes' => 'nullable|string',
+            'is_mocked' => 'nullable|boolean',
         ]);
+
+        // 1. Anti-Fraud: Deteksi Fake GPS / Mock Location
+        if ($request->boolean('is_mocked')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Terdeteksi penggunaan Fake GPS / Mock Location! Matikan aplikasi lokasi tiruan untuk melanjutkan presensi.',
+            ], 403);
+        }
+
+        // 2. Anti-Bypass: Validasi Geofencing Ulang di Server
+        $institution = $employee->institution;
+        if ($institution && $institution->latitude && $institution->longitude) {
+            $dist = $this->calculateHaversine(
+                $validated['latitude'],
+                $validated['longitude'],
+                $institution->latitude,
+                $institution->longitude
+            );
+            $maxRadius = $institution->radius_meters ?? 100;
+
+            if ($dist > $maxRadius) {
+                return response()->json([
+                    'success' => false,
+                    'message' => "Posisi Anda berada di luar radius resmi unit kerja ({$dist}m dari batas {$maxRadius}m). Presensi ditolak.",
+                ], 422);
+            }
+        }
 
         $today = Carbon::today()->toDateString();
         $nowTime = Carbon::now()->toTimeString();
+
+        // 3. Otomatisasi Status Hadir / Terlambat Berdasarkan Jadwal
+        $status = 'hadir';
+        $workSchedule = WorkSchedule::where('institution_id', $employee->institution_id)
+            ->where('is_active', true)
+            ->first();
+
+        if ($workSchedule && $workSchedule->time_in) {
+            $tolerance = $workSchedule->late_tolerance_minutes ?? 15;
+            $maxOnTime = Carbon::parse($workSchedule->time_in)->addMinutes($tolerance)->toTimeString();
+            if ($nowTime > $maxOnTime) {
+                $status = 'terlambat';
+            }
+        }
 
         $attendance = Attendance::firstOrCreate(
             ['employee_id' => $employee->id, 'date' => $today],
             [
                 'institution_id' => $employee->institution_id,
                 'time_in' => $nowTime,
-                'status' => 'hadir',
-                'latitude_in' => $validated['latitude'] ?? null,
-                'longitude_in' => $validated['longitude'] ?? null,
+                'status' => $status,
+                'latitude_in' => $validated['latitude'],
+                'longitude_in' => $validated['longitude'],
                 'notes' => $validated['notes'] ?? 'Presensi masuk mobile',
             ]
         );
@@ -172,7 +229,7 @@ class MobileApiController extends Controller
         ]);
     }
 
-    // 5. API Check-Out
+    // 5. API Check-Out dengan Validasi Geofencing Server & Deteksi Fake GPS
     public function checkOut(Request $request)
     {
         $employee = $this->getEmployee($request);
@@ -181,9 +238,37 @@ class MobileApiController extends Controller
         }
 
         $validated = $request->validate([
-            'latitude' => 'nullable|numeric',
-            'longitude' => 'nullable|numeric',
+            'latitude' => 'required|numeric',
+            'longitude' => 'required|numeric',
+            'is_mocked' => 'nullable|boolean',
         ]);
+
+        // 1. Anti-Fraud: Deteksi Fake GPS / Mock Location
+        if ($request->boolean('is_mocked')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Terdeteksi penggunaan Fake GPS / Mock Location! Matikan aplikasi lokasi tiruan untuk melanjutkan presensi.',
+            ], 403);
+        }
+
+        // 2. Anti-Bypass: Validasi Geofencing Ulang di Server
+        $institution = $employee->institution;
+        if ($institution && $institution->latitude && $institution->longitude) {
+            $dist = $this->calculateHaversine(
+                $validated['latitude'],
+                $validated['longitude'],
+                $institution->latitude,
+                $institution->longitude
+            );
+            $maxRadius = $institution->radius_meters ?? 100;
+
+            if ($dist > $maxRadius) {
+                return response()->json([
+                    'success' => false,
+                    'message' => "Posisi Anda berada di luar radius resmi unit kerja ({$dist}m dari batas {$maxRadius}m). Presensi pulang ditolak.",
+                ], 422);
+            }
+        }
 
         $today = Carbon::today()->toDateString();
         $attendance = Attendance::where('employee_id', $employee->id)
@@ -199,8 +284,8 @@ class MobileApiController extends Controller
 
         $attendance->update([
             'time_out' => Carbon::now()->toTimeString(),
-            'latitude_out' => $validated['latitude'] ?? null,
-            'longitude_out' => $validated['longitude'] ?? null,
+            'latitude_out' => $validated['latitude'],
+            'longitude_out' => $validated['longitude'],
         ]);
 
         return response()->json([
