@@ -1,66 +1,217 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+<div align="center">
+  <img src="public/logo.png" alt="Logo YABAT PRESENSI" width="120" style="margin-bottom: 12px;"/>
+  <h1>YABAT PRESENSI</h1>
+  <p><strong>Sistem Presensi Pegawai Berbasis Geofencing GPS Real-Time & Panel Manajemen Terpadu</strong></p>
+  <p><em>Yayasan Anak Bangsa Aceh Tenggara (YABAT) &bull; STKIP Usman Safri Kutacane</em></p>
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+  <p>
+    <img src="https://img.shields.io/badge/Laravel-10.x-FF2D20?style=for-the-badge&logo=laravel&logoColor=white" alt="Laravel">
+    <img src="https://img.shields.io/badge/React_Native-Expo_SDK_57-000020?style=for-the-badge&logo=expo&logoColor=white" alt="Expo SDK 57">
+    <img src="https://img.shields.io/badge/MySQL-8.0-4479A1?style=for-the-badge&logo=mysql&logoColor=white" alt="MySQL">
+    <img src="https://img.shields.io/badge/TailwindCSS-3.x-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" alt="TailwindCSS">
+    <img src="https://img.shields.io/badge/Sanctum-Token_Auth-blue?style=for-the-badge" alt="Sanctum">
+  </p>
+</div>
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 📖 Tentang Proyek
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+**YABAT PRESENSI** adalah ekosistem aplikasi presensi terintegrasi yang dirancang khusus untuk memenuhi kebutuhan absensi tenaga pendidik dan staf di lingkungan Yayasan Anak Bangsa Aceh Tenggara. 
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Sistem ini menerapkan model arsitektur terpisah (*Dual-Channel Role Architecture*):
+1. **Portal Web Browser**: Dikhususkan eksklusif untuk **Administrator Yayasan** guna mengelola master data pegawai, memantau kehadiran harian secara *live*, mengatur titik koordinat GPS & radius geofence unit institusi, serta mencetak rekap laporan absensi.
+2. **Aplikasi Mobile (Android Standalone APK)**: Dikhususkan untuk **Pegawai** melakukan presensi masuk dan pulang menggunakan sensor GPS *native high-accuracy* dengan proteksi anti-kecurangan (*Anti-Fake GPS / Mock Location Detection*).
 
-## Learning Laravel
+---
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## 🌟 Fitur Utama
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+### 📱 1. Mobile App Pegawai (Pure React Native Expo)
+- **100% Native GPS Geolocation**: Menggunakan modul `expo-location` dengan akurasi meter tinggi dan popup paksa pengaktifan GPS sistem (*System Location Dialog*).
+- **Dual Geofence Haversine**: Penghitungan jarak langsung di HP dan divalidasi ulang di backend untuk memastikan pegawai berada di dalam radius resmi unit kerja.
+- **Anti-Fraud & Anti-Fake GPS**: Deteksi otomatis aplikasi lokasi tiruan (`isMocked` check) di perangkat Android.
+- **4 Tab Navigasi Terpadu**:
+  - **Beranda**: Jam operasional digital *Live WIB*, ringkasan status kehadiran harian, dan informasi jadwal kerja resmi.
+  - **Presensi**: Titik sensor GPS real-time, status radius geofencing, tombol presensi masuk/pulang instan, dan panduan jarak.
+  - **Riwayat**: Filter rekapitulasi kehadiran (*Bulan Ini*, *Minggu Ini*, *Semua*), kartu metrik statistik (*Hadir, Telat, Izin, Alpa*), dan log harian.
+  - **Profil**: Detail identitas pegawai, NIP/NIDN, unit institusi naungan, kontak, dan opsi keamanan logout.
+- **Real-Time Auto Refresh (`useFocusEffect`)**: Status presensi langsung ter-update otomatis saat berpindah tab tanpa perlu reload manual.
+- **Dynamic Safe Area Insets**: Bebas bug poni notch, punch-hole camera, dan terhindar dari tabrakan System Navigation Bar Android.
+- **Light Theme Splash**: Tampilan awal bersih dan profesional dengan logo resmi beresolusi tinggi.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 💻 2. Portal Manajemen Web Administrator
+- **Dashboard Real-Time**: Rekap persentase kehadiran hari ini, statistik keterlambatan, dan grafik tren mingguan.
+- **Pengaturan Koordinat Titik Kampus Terpadu**: Kemudahan mengubah titik Latitude, Longitude, dan Radius Toleransi (Meter) langsung dari dashboard admin untuk seluruh unit sekolah/kampus.
+- **Manajemen Data Pegawai**: CRUD data pegawai terhubung dengan akun login NIP/Email dan status keaktifan.
+- **Manajemen Jadwal Kerja**: Konfigurasi jam masuk, jam pulang, toleransi keterlambatan menit, dan hari kerja.
+- **Laporan & Ekspor Excel**: Rekapitulasi absensi bulanan dan rentang tanggal dengan ekspor spreadsheet resmi.
+- **Restriksi Akses Browser**: Perlindungan otomatis yang menolak akses browser bagi pegawai dan mengarahkannya untuk menggunakan aplikasi APK resmi.
 
-## Laravel Sponsors
+---
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+## 🏗️ Struktur Direktori Proyek
 
-### Premium Partners
+```text
+yabatpresensi/
+├── app/
+│   ├── Http/
+│   │   ├── Controllers/
+│   │   │   ├── Api/
+│   │   │   │   └── MobileApiController.php    # RESTful API Sanctum khusus Mobile App
+│   │   │   ├── AuthController.php             # Login Admin & proteksi browser
+│   │   │   ├── DashboardController.php        # Panel Dashboard & update lokasi GPS
+│   │   │   ├── AttendanceController.php       # Monitoring & rekap presensi admin
+│   │   │   └── EmployeeController.php         # Manajemen master data pegawai
+│   │   └── Middleware/
+│   │       └── EnsureUserIsAdmin.php          # Middleware proteksi role admin
+│   └── Models/
+│       ├── Attendance.php                     # Model log kehadiran (lat, lng, in, out)
+│       ├── Employee.php                       # Model data pegawai
+│       ├── Institution.php                    # Model institusi & titik koordinat GPS
+│       └── WorkSchedule.php                   # Model jam kerja & toleransi
+├── resources/
+│   └── views/                                 # Antarmuka web Blade & TailwindCSS
+│       ├── admin/                             # Halaman Dashboard, Pegawai, Laporan
+│       ├── welcome.blade.php                  # Halaman Login Portal Admin
+│       └── mobile_notice.blade.php            # Halaman info penonaktifan browser HP
+├── routes/
+│   ├── api.php                                # Endpoint API Mobile (/api/mobile/*)
+│   └── web.php                                # Rute web browser portal admin
+│
+└── yabat-apk/                                 # Proyek Mobile React Native (Expo)
+    ├── assets/                                # Aset logo transparan, icon & splash
+    ├── src/
+    │   ├── api/
+    │   │   └── client.js                      # Axios instance + auto Bearer Token
+    │   ├── constants/
+    │   │   └── theme.js                       # Palette warna resmi YABAT
+    │   ├── context/
+    │   │   └── AuthContext.js                 # State session login & data pegawai
+    │   ├── utils/
+    │   │   └── helpers.js                     # Rumus Haversine, date ID & time WIB
+    │   ├── components/
+    │   │   └── MobileHeader.js                # Header pegawai dark theme + ambient glow
+    │   ├── navigation/
+    │   │   ├── AppNavigator.js                # Auth routing flow
+    │   │   └── MainTabNavigator.js            # 4 Bottom Tab Bar dinamis
+    │   └── screens/
+    │       ├── LoginScreen.js                 # Login pegawai (Email/NIP)
+    │       ├── BerandaScreen.js               # Beranda jam digital & jadwal
+    │       ├── PresensiScreen.js              # Presensi GPS & geofence validasi
+    │       ├── RiwayatScreen.js               # Riwayat presensi & statistik
+    │       └── ProfilScreen.js                # Profil lengkap & preferensi
+    ├── app.json                               # Konfigurasi package & permission Android
+    ├── eas.json                               # Konfigurasi Cloud Build APK standalone
+    └── App.js                                 # Root component + SafeAreaProvider
+```
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
+---
 
-## Contributing
+## 🚀 Panduan Instalasi & Menjalankan
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### Persyaratan Sistem
+- PHP >= 8.1 dengan ekstensi PDO, OpenSSL, Mbstring
+- Composer
+- Node.js >= 18.x & NPM
+- MySQL Database
 
-## Code of Conduct
+---
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### A. Menjalankan Backend Laravel
 
-## Security Vulnerabilities
+1. **Clone Repositori**:
+   ```bash
+   git clone https://github.com/rezadesky/yabatpresensi.git
+   cd yabatpresensi
+   ```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+2. **Install Dependensi PHP**:
+   ```bash
+   composer install
+   ```
 
-## License
+3. **Konfigurasi Environment**:
+   ```bash
+   cp .env.example .env
+   php artisan key:generate
+   ```
+   *Sesuaikan konfigurasi database (`DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD`) pada file `.env`.*
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+4. **Migrasi Database & Seeder**:
+   ```bash
+   php artisan migrate --seed
+   ```
+
+5. **Jalankan Server Lokal**:
+   ```bash
+   php artisan serve
+   ```
+
+---
+
+### B. Menjalankan Aplikasi Mobile (React Native Expo)
+
+1. **Masuk ke Direktori Mobile**:
+   ```bash
+   cd yabat-apk
+   ```
+
+2. **Install Dependensi Node.js**:
+   ```bash
+   npm install
+   ```
+
+3. **Jalankan Metro Dev Server**:
+   ```bash
+   npx expo start -c
+   ```
+
+4. **Buka di HP Android**:
+   - Buka aplikasi **Expo Go** di HP Android.
+   - Scan QR code yang tampil di terminal atau masukkan URL Metro (misal: `exp://192.168.x.x:8081`).
+
+---
+
+### C. Build File APK Standalone (Siap Pasang di HP)
+
+Aplikasi telah dikonfigurasi dengan Expo Application Services (EAS):
+
+```bash
+cd yabat-apk
+npx eas build --platform android --profile preview
+```
+Setelah proses cloud build selesai, Anda akan mendapatkan tautan unduhan langsung file `.apk`.
+
+---
+
+## 🔒 Alur Keamanan & Anti-Fraud
+
+```
+[Pegawai Klik Presensi]
+         │
+         ├──> 1. Deteksi Mock Location di HP (isMocked === true?)
+         │        ├── Ya  --> Tampilkan Peringatan & Kunci Tombol
+         │        └── Tidak
+         │
+         ├──> 2. Pengecekan GPS Service (GPS Aktif?)
+         │        ├── Tidak --> Munculkan Dialog Sistem Android untuk Menyalakan GPS
+         │        └── Ya
+         │
+         ├──> 3. Hitung Jarak Haversine di Perangkat (Jarak <= Radius?)
+         │        ├── Tidak --> Tombol Tetap Non-Aktif
+         │        └── Ya    --> Kirim Koordinat ke API (/api/mobile/checkin)
+         │
+         └──> 4. Validasi Ulang di Server Laravel (Backend)
+                  ├── Verifikasi is_mocked (False)
+                  ├── Hitung ulang Haversine dengan koordinat resmi database
+                  ├── Cek toleransi jadwal kerja (Set status Hadir / Terlambat)
+                  └── Simpan Log Presensi ke Database MySQL
+```
+
+---
+
+## 👥 Hak Cipta & Pengembang
+
+Dikembangkan untuk **Yayasan Anak Bangsa Aceh Tenggara (YABAT)** & **STKIP Usman Safri Kutacane**.  
+© 2026 Seluruh Hak Cipta Dilindungi.
