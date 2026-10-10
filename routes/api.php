@@ -14,6 +14,24 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+use App\Http\Controllers\Api\MobileApiController;
+
+/*
+|--------------------------------------------------------------------------
+| Mobile Native API Routes
+|--------------------------------------------------------------------------
+*/
+Route::post('/mobile/login', [MobileApiController::class, 'login']);
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/user', function (Request $request) {
+        return $request->user();
+    });
+    Route::get('/mobile/beranda', [MobileApiController::class, 'beranda']);
+    Route::get('/mobile/presensi-status', [MobileApiController::class, 'presensiStatus']);
+    Route::post('/mobile/checkin', [MobileApiController::class, 'checkIn']);
+    Route::post('/mobile/checkout', [MobileApiController::class, 'checkOut']);
+    Route::get('/mobile/riwayat', [MobileApiController::class, 'riwayat']);
+    Route::get('/mobile/profil', [MobileApiController::class, 'profil']);
+    Route::post('/mobile/logout', [MobileApiController::class, 'logout']);
 });
