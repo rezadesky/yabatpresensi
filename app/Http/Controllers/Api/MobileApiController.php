@@ -193,8 +193,8 @@ class MobileApiController extends Controller
             }
         }
 
-        $today = Carbon::today()->toDateString();
-        $nowTime = Carbon::now()->toTimeString();
+        $today = Carbon::today('Asia/Jakarta')->toDateString();
+        $nowTime = Carbon::now('Asia/Jakarta')->toTimeString();
 
         // 3. Otomatisasi Status Hadir / Terlambat Berdasarkan Jadwal
         $status = 'hadir';
@@ -270,7 +270,7 @@ class MobileApiController extends Controller
             }
         }
 
-        $today = Carbon::today()->toDateString();
+        $today = Carbon::today('Asia/Jakarta')->toDateString();
         $attendance = Attendance::where('employee_id', $employee->id)
             ->whereDate('date', $today)
             ->first();
@@ -283,7 +283,7 @@ class MobileApiController extends Controller
         }
 
         $attendance->update([
-            'time_out' => Carbon::now()->toTimeString(),
+            'time_out' => Carbon::now('Asia/Jakarta')->toTimeString(),
             'latitude_out' => $validated['latitude'],
             'longitude_out' => $validated['longitude'],
         ]);
