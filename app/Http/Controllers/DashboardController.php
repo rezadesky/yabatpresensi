@@ -53,12 +53,19 @@ class DashboardController extends Controller
                 ];
             });
 
-        // 7-day trend
+        // 7-day trend (Optimized Single Grouped Query)
+        $sevenDaysAgo = Carbon::today()->subDays(6)->toDateString();
+        $weeklyCounts = Attendance::where('date', '>=', $sevenDaysAgo)
+            ->whereIn('status', ['hadir', 'terlambat'])
+            ->selectRaw('date, count(*) as total')
+            ->groupBy('date')
+            ->pluck('total', 'date');
+
         $weeklyStats = [];
         for ($i = 6; $i >= 0; $i--) {
             $date = Carbon::today()->subDays($i)->toDateString();
             $dayName = Carbon::today()->subDays($i)->locale('id')->isoFormat('ddd');
-            $count = Attendance::whereDate('date', $date)->whereIn('status', ['hadir', 'terlambat'])->count();
+            $count = $weeklyCounts[$date] ?? 0;
             $percentage = $totalEmployees > 0 ? min(100, round(($count / $totalEmployees) * 100)) : 0;
             $weeklyStats[] = [
                 'day' => $dayName,
