@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, Platform } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 
 import BerandaScreen from '../screens/BerandaScreen';
@@ -11,6 +12,12 @@ import ProfilScreen from '../screens/ProfilScreen';
 const Tab = createBottomTabNavigator();
 
 export default function MainTabNavigator() {
+  const insets = useSafeAreaInsets();
+  
+  // Dynamic bottom padding to handle Android gesture navigation & 3-button navigation bar
+  const bottomPadding = Math.max(insets.bottom, 12);
+  const tabHeight = 60 + bottomPadding;
+
   return (
     <Tab.Navigator
       initialRouteName="Beranda"
@@ -22,13 +29,13 @@ export default function MainTabNavigator() {
           backgroundColor: '#ffffff',
           borderTopWidth: 1,
           borderTopColor: '#e2e8f0',
-          height: Platform.OS === 'ios' ? 84 : 64,
-          paddingBottom: Platform.OS === 'ios' ? 24 : 8,
+          height: tabHeight,
+          paddingBottom: bottomPadding,
           paddingTop: 8,
-          elevation: 12,
+          elevation: 16,
           shadowColor: '#000',
-          shadowOffset: { width: 0, height: -2 },
-          shadowOpacity: 0.06,
+          shadowOffset: { width: 0, height: -3 },
+          shadowOpacity: 0.08,
           shadowRadius: 6,
         },
         tabBarLabelStyle: {
