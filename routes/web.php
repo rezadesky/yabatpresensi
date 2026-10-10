@@ -41,8 +41,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/presensi-mobile/checkin', [AttendanceController::class, 'checkIn'])->name('presensi.mobile.checkin');
     Route::post('/presensi-mobile/checkout', [AttendanceController::class, 'checkOut'])->name('presensi.mobile.checkout');
 
-    // Admin Panel Routes
-    Route::prefix('admin')->name('admin.')->group(function () {
+    // Admin Panel Routes (Hanya untuk Role Admin)
+    Route::prefix('admin')->name('admin.')->middleware('admin')->group(function () {
         // 1. Dashboard
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
         Route::post('/dashboard/locations', [DashboardController::class, 'updateLocations'])->name('dashboard.locations');

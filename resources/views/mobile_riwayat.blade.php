@@ -22,6 +22,22 @@
         </span>
     </div>
 
+    <!-- Filter Periode (Tabs Pill) -->
+    <div class="flex items-center gap-1.5 p-1 bg-slate-100 rounded-xl text-[11px] font-semibold">
+        <a href="{{ route('mobile.riwayat', ['period' => 'month']) }}" 
+           class="flex-1 text-center py-1.5 rounded-lg transition {{ ($period ?? 'month') === 'month' ? 'bg-white text-blue-600 font-bold shadow-sm' : 'text-slate-500 hover:text-slate-800' }}">
+            Bulan Ini
+        </a>
+        <a href="{{ route('mobile.riwayat', ['period' => 'week']) }}" 
+           class="flex-1 text-center py-1.5 rounded-lg transition {{ ($period ?? '') === 'week' ? 'bg-white text-blue-600 font-bold shadow-sm' : 'text-slate-500 hover:text-slate-800' }}">
+            Minggu Ini
+        </a>
+        <a href="{{ route('mobile.riwayat', ['period' => 'all']) }}" 
+           class="flex-1 text-center py-1.5 rounded-lg transition {{ ($period ?? '') === 'all' ? 'bg-white text-blue-600 font-bold shadow-sm' : 'text-slate-500 hover:text-slate-800' }}">
+            Semua
+        </a>
+    </div>
+
     <!-- 4 Minimal Stat Cards -->
     <div class="grid grid-cols-4 gap-2 text-center">
         <div class="bg-emerald-50/70 border border-emerald-100 p-2 rounded-xl">
@@ -58,7 +74,9 @@
             <span class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Catatan Waktu</span>
             <div class="text-xs font-bold text-slate-800">Daftar Presensi Harian</div>
         </div>
-        <span class="text-[10px] text-slate-400">Diurutkan terbaru</span>
+        <span class="text-[10px] text-slate-400">
+            {{ ($period ?? 'month') === 'week' ? '7 Hari Terakhir' : (($period ?? 'month') === 'all' ? 'Seluruh Riwayat' : 'Bulan Berjalan') }}
+        </span>
     </div>
 
     <!-- Attendance Items List -->

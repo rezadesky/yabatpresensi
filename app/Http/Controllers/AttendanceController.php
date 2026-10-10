@@ -78,15 +78,27 @@ class AttendanceController extends Controller
         ));
     }
 
-    // 3. Mobile Tab Riwayat Presensi
+    // 3. Mobile Tab Riwayat Presensi (Dengan Filter Periode)
     public function mobileRiwayat(Request $request)
     {
         $selectedEmployee = $this->getAuthenticatedEmployee($request);
+        $period = $request->get('period', 'month'); // default: month
 
         $historyRecords = collect();
         if ($selectedEmployee) {
-            $historyRecords = Attendance::where('employee_id', $selectedEmployee->id)
-                ->orderBy('date', 'desc')
+            $query = Attendance::where('employee_id', $selectedEmployee->id);
+
+            if ($period === 'week') {
+                $query->whereBetween('date', [
+                    Carbon::now()->startOfWeek()->toDateString(),
+                    Carbon::now()->endOfWeek()->toDateString()
+                ]);
+            } elseif ($period === 'month') {
+                $query->whereMonth('date', Carbon::now()->month)
+                      ->whereYear('date', Carbon::now()->year);
+            }
+
+            $historyRecords = $query->orderBy('date', 'desc')
                 ->orderBy('time_in', 'desc')
                 ->paginate(15)
                 ->withQueryString();
@@ -94,7 +106,8 @@ class AttendanceController extends Controller
 
         return view('mobile_riwayat', compact(
             'selectedEmployee',
-            'historyRecords'
+            'historyRecords',
+            'period'
         ));
     }
 

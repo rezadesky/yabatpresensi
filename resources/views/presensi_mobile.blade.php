@@ -27,6 +27,29 @@
         .pb-safe {
             padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 5.5rem);
         }
+
+        /* Page & Toast Animations */
+        @keyframes toastSlideIn {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -15px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, 0) scale(1);
+            }
+        }
+        .toast-animate-in {
+            animation: toastSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes pageFadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .page-enter-animate {
+            animation: pageFadeIn 0.25s ease-out forwards;
+        }
     </style>
 </head>
 <body class="h-full text-slate-800 antialiased bg-slate-100 selection:bg-blue-600 selection:text-white">
@@ -250,15 +273,15 @@
                     </p>
                 </div>
 
-                <!-- Tombol Periksa Lokasi GPS Perangkat -->
+                <!-- Tombol Periksa / Refresh Lokasi GPS Perangkat -->
                 <button 
                     type="button" 
                     id="btnCheckLocation" 
-                    class="w-full py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 active:scale-[0.99] text-white text-xs font-semibold flex items-center justify-center gap-2 shadow-sm transition">
-                    <svg id="btnGpsIcon" class="w-4 h-4 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 1.343-3 3s1.343 3 3 3 3-1.343 3-3-1.343-3-3-3zm0 0V4m0 16v-4m8-4h-4M4 12h4" />
+                    class="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 active:scale-[0.98] text-white text-xs font-bold flex items-center justify-center gap-2 shadow-md shadow-blue-500/20 transition cursor-pointer">
+                    <svg id="btnGpsIcon" class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                     </svg>
-                    <span id="btnCheckLocationText">Periksa Lokasi Saya Sekarang</span>
+                    <span id="btnCheckLocationText">Periksa / Perbarui Titik GPS</span>
                 </button>
             </section>
 
@@ -288,6 +311,17 @@
                         <div class="text-[10px] text-slate-400 font-medium">Batas Maksimal Radius</div>
                         <div id="displayAllowedRadius" class="text-sm font-bold text-blue-600 font-mono-num mt-0.5">{{ $selectedEmployee->institution->radius_meters ?? 100 }} Meter</div>
                         <div class="text-[10px] text-slate-400">Kebijakan resmi yayasan</div>
+                    </div>
+                </div>
+
+                <!-- Indikator Informatif Sisa Jarak ke Batas Radius -->
+                <div id="distanceGuidanceBox" class="hidden p-3 rounded-xl border transition-all text-xs">
+                    <div class="flex items-center gap-2">
+                        <div id="distanceGuidanceIcon" class="w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0"></div>
+                        <div class="flex-1">
+                            <div id="distanceGuidanceTitle" class="font-bold text-[11px]"></div>
+                            <div id="distanceGuidanceDesc" class="text-[10px] mt-0.5 leading-snug"></div>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -328,9 +362,17 @@
                     </button>
                 </div>
 
-                <!-- Feedback Toast Interaktif -->
-                <div id="actionToast" class="hidden p-3 rounded-xl bg-slate-900 text-white text-xs text-center font-medium shadow-lg animate-fade">
-                    <span id="toastMessage">Memproses presensi...</span>
+                <!-- Feedback Toast Interaktif (Floating Modern Toast Notification) -->
+                <div id="actionToast" class="hidden fixed top-5 left-1/2 -translate-x-1/2 z-50 w-[90%] max-w-sm rounded-2xl bg-slate-900/95 backdrop-blur-md text-white text-xs p-3.5 shadow-2xl border border-slate-700/80 flex items-center gap-3 toast-animate-in">
+                    <div id="toastIconContainer" class="w-8 h-8 rounded-xl bg-blue-500/20 text-blue-400 border border-blue-400/30 flex items-center justify-center flex-shrink-0">
+                        <svg id="toastIcon" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div id="toastTitle" class="font-bold text-white text-xs leading-tight">Pemberitahuan</div>
+                        <div id="toastMessage" class="text-[11px] text-slate-300 mt-0.5 leading-snug">Memproses presensi...</div>
+                    </div>
                 </div>
             </section>
 
@@ -383,7 +425,7 @@
         <nav class="fixed bottom-0 left-0 right-0 z-30 max-w-md mx-auto bg-white/95 backdrop-blur-md border-t border-slate-200/80 px-4 py-2 shadow-lg">
             <div class="flex items-center justify-around text-[10px] font-semibold text-slate-400">
                 <!-- Beranda -->
-                <a href="{{ route('admin.dashboard') }}" class="flex flex-col items-center gap-1 py-1 px-3 text-slate-400 hover:text-slate-600 transition">
+                <a href="{{ route('mobile.beranda') }}" class="flex flex-col items-center gap-1 py-1 px-3 text-slate-400 hover:text-slate-600 transition">
                     <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                     </svg>
@@ -403,7 +445,7 @@
                 </a>
 
                 <!-- Riwayat -->
-                <a href="{{ route('admin.riwayat') }}" class="flex flex-col items-center gap-1 py-1 px-3 text-slate-400 hover:text-slate-600 transition">
+                <a href="{{ route('mobile.riwayat') }}" class="flex flex-col items-center gap-1 py-1 px-3 text-slate-400 hover:text-slate-600 transition-all duration-200 active:scale-95">
                     <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
@@ -411,11 +453,11 @@
                 </a>
 
                 <!-- Profil Pegawai -->
-                <a href="{{ route('admin.pegawai') }}" class="flex flex-col items-center gap-1 py-1 px-3 text-slate-400 hover:text-slate-600 transition">
+                <a href="{{ route('mobile.profil') }}" class="flex flex-col items-center gap-1 py-1 px-3 text-slate-400 hover:text-slate-600 transition-all duration-200 active:scale-95">
                     <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                     </svg>
-                    <span>Pegawai</span>
+                    <span>Profil</span>
                 </a>
             </div>
         </nav>
@@ -461,6 +503,10 @@
 
             const areaStatusBadge = document.getElementById('areaStatusBadge');
             const displayDistance = document.getElementById('displayDistance');
+            const distanceGuidanceBox = document.getElementById('distanceGuidanceBox');
+            const distanceGuidanceIcon = document.getElementById('distanceGuidanceIcon');
+            const distanceGuidanceTitle = document.getElementById('distanceGuidanceTitle');
+            const distanceGuidanceDesc = document.getElementById('distanceGuidanceDesc');
 
             const btnCheckIn = document.getElementById('btnCheckIn');
             const btnCheckInSub = document.getElementById('btnCheckInSub');
@@ -468,6 +514,9 @@
             const btnCheckOutSub = document.getElementById('btnCheckOutSub');
             const actionToast = document.getElementById('actionToast');
             const toastMessage = document.getElementById('toastMessage');
+            const toastTitle = document.getElementById('toastTitle');
+            const toastIcon = document.getElementById('toastIcon');
+            const toastIconContainer = document.getElementById('toastIconContainer');
 
             const overallAttendanceSummary = document.getElementById('overallAttendanceSummary');
             const badgeIn = document.getElementById('badgeIn');
@@ -530,13 +579,40 @@
                 return Math.round(R * c);
             }
 
-            // Proses Evaluasi Geofencing
-            function processCoordinates(lat, lng, accuracy) {
-                userCoordinates = { lat, lng, accuracy };
+            // Proses Evaluasi Geofencing & Keamanan GPS
+            function processCoordinates(lat, lng, accuracy, timestamp) {
+                const now = Date.now();
+                const posTime = timestamp || now;
+                const ageSeconds = Math.round((now - posTime) / 1000);
+
+                userCoordinates = { lat, lng, accuracy, timestamp: posTime };
 
                 displayLat.textContent = lat.toFixed(6);
                 displayLng.textContent = lng.toFixed(6);
                 displayAccuracy.textContent = `± ${Math.round(accuracy)} Meter`;
+
+                // 1. Pengecekan data lokasi usang (Cache / Fake GPS stale position > 30 detik)
+                if (ageSeconds > 30) {
+                    gpsStatusPill.textContent = 'Lokasi Kedaluwarsa';
+                    gpsStatusPill.className = 'text-[10px] font-semibold px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200';
+                    showGpsError('Data Lokasi Kedaluwarsa', 'Data koordinat GPS terdeteksi data usang/cache. Silakan klik Perbarui Lokasi lagi di area terbuka.');
+                    updateActionButtons();
+                    return;
+                }
+
+                // 2. Pengecekan Toleransi Akurasi Satelit GPS (coords.accuracy > 100m)
+                if (accuracy > 100) {
+                    gpsStatusPill.textContent = 'Akurasi GPS Rendah';
+                    gpsStatusPill.className = 'text-[10px] font-semibold px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200';
+                    areaStatusBadge.textContent = 'Akurasi Tidak Memadai';
+                    areaStatusBadge.className = 'text-[10px] font-bold px-2.5 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200';
+                    showGpsError(
+                        'Akurasi GPS Belum Cukup', 
+                        `Akurasi saat ini ±${Math.round(accuracy)} meter (maksimum 100m). Mohon tunggu beberapa detik atau keluar ke dekat jendela/area terbuka agar sinyal satelit GPS stabil.`
+                    );
+                    updateActionButtons();
+                    return;
+                }
 
                 gpsErrorBox.classList.add('hidden');
                 gpsStatusPill.textContent = 'Lokasi Ditemukan';
@@ -545,20 +621,36 @@
                 calculatedDistance = calculateHaversineDistance(lat, lng, currentEmployee.lat, currentEmployee.lng);
                 displayDistance.textContent = `${calculatedDistance.toLocaleString()} Meter`;
 
+                distanceGuidanceBox.classList.remove('hidden');
                 if (calculatedDistance <= currentEmployee.radius) {
                     isInsideRadius = true;
                     areaStatusBadge.textContent = 'Dalam Area Presensi';
                     areaStatusBadge.className = 'text-[10px] font-bold px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200';
+
+                    distanceGuidanceBox.className = 'p-3 rounded-xl bg-emerald-50/80 border border-emerald-200/80 text-emerald-800 text-xs';
+                    distanceGuidanceIcon.className = 'w-6 h-6 rounded-lg bg-emerald-500/20 text-emerald-600 flex items-center justify-center flex-shrink-0';
+                    distanceGuidanceIcon.innerHTML = '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>';
+                    distanceGuidanceTitle.textContent = 'Posisi Anda Sudah Terverifikasi';
+                    distanceGuidanceDesc.textContent = `Anda berada ${calculatedDistance} meter dari titik pusat unit (${currentEmployee.radius}m batas aman). Silakan klik tombol presensi.`;
                 } else {
                     isInsideRadius = false;
-                    areaStatusBadge.textContent = 'Di Luar Area Presensi';
+                    const excessDistance = calculatedDistance - currentEmployee.radius;
+                    areaStatusBadge.textContent = `Di Luar Area (+${excessDistance}m)`;
                     areaStatusBadge.className = 'text-[10px] font-bold px-2.5 py-1 rounded-full bg-rose-50 text-rose-700 border border-rose-200';
+
+                    distanceGuidanceBox.className = 'p-3 rounded-xl bg-amber-50/90 border border-amber-200 text-amber-800 text-xs';
+                    distanceGuidanceIcon.className = 'w-6 h-6 rounded-lg bg-amber-500/20 text-amber-600 flex items-center justify-center flex-shrink-0';
+                    distanceGuidanceIcon.innerHTML = '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>';
+                    distanceGuidanceTitle.textContent = `Anda Berjarak ${excessDistance} Meter Lagi dari Batas Radius`;
+                    distanceGuidanceDesc.textContent = `Batas radius kerja adalah ${currentEmployee.radius} meter. Mohon melangkah mendekat ke arah area kantor unit yayasan untuk dapat melakukan presensi.`;
                 }
 
                 updateActionButtons();
             }
 
             function updateActionButtons() {
+                const isAccurateEnough = userCoordinates && userCoordinates.accuracy <= 100;
+
                 // Tombol Masuk
                 if (hasCheckedIn) {
                     btnCheckIn.disabled = true;
@@ -568,6 +660,10 @@
                     btnCheckIn.disabled = true;
                     btnCheckIn.className = 'py-3 px-3 rounded-2xl bg-slate-200 text-slate-400 font-bold text-xs flex flex-col items-center justify-center gap-1 shadow-sm transition disabled:cursor-not-allowed';
                     btnCheckInSub.textContent = 'Periksa lokasi dahulu';
+                } else if (!isAccurateEnough) {
+                    btnCheckIn.disabled = true;
+                    btnCheckIn.className = 'py-3 px-3 rounded-2xl bg-amber-100/70 text-amber-700 font-bold text-xs flex flex-col items-center justify-center gap-1 shadow-sm transition disabled:cursor-not-allowed';
+                    btnCheckInSub.textContent = 'Akurasi GPS rendah (>100m)';
                 } else if (!isInsideRadius) {
                     btnCheckIn.disabled = true;
                     btnCheckIn.className = 'py-3 px-3 rounded-2xl bg-rose-100/70 text-rose-500 font-bold text-xs flex flex-col items-center justify-center gap-1 shadow-sm transition disabled:cursor-not-allowed';
@@ -591,6 +687,10 @@
                     btnCheckOut.disabled = true;
                     btnCheckOut.className = 'py-3 px-3 rounded-2xl bg-slate-200 text-slate-400 font-bold text-xs flex flex-col items-center justify-center gap-1 shadow-sm transition disabled:cursor-not-allowed';
                     btnCheckOutSub.textContent = 'Periksa lokasi dahulu';
+                } else if (!isAccurateEnough) {
+                    btnCheckOut.disabled = true;
+                    btnCheckOut.className = 'py-3 px-3 rounded-2xl bg-amber-100/70 text-amber-700 font-bold text-xs flex flex-col items-center justify-center gap-1 shadow-sm transition disabled:cursor-not-allowed';
+                    btnCheckOutSub.textContent = 'Akurasi GPS rendah (>100m)';
                 } else if (!isInsideRadius) {
                     btnCheckOut.disabled = true;
                     btnCheckOut.className = 'py-3 px-3 rounded-2xl bg-rose-100/70 text-rose-500 font-bold text-xs flex flex-col items-center justify-center gap-1 shadow-sm transition disabled:cursor-not-allowed';
@@ -628,7 +728,8 @@
                         processCoordinates(
                             position.coords.latitude,
                             position.coords.longitude,
-                            position.coords.accuracy
+                            position.coords.accuracy,
+                            position.timestamp
                         );
                     },
                     function (error) {
@@ -675,7 +776,16 @@
             btnCheckIn.addEventListener('click', function () {
                 if (!isInsideRadius || hasCheckedIn || !userCoordinates) return;
 
+                // Disable state & Loading spinner
                 btnCheckIn.disabled = true;
+                const originalHtml = btnCheckIn.querySelector('div').innerHTML;
+                btnCheckIn.querySelector('div').innerHTML = `
+                    <svg class="animate-spin -ml-1 mr-1 h-4 w-4 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span>Mengirim Data...</span>
+                `;
                 btnCheckInSub.textContent = 'Menyimpan ke server...';
 
                 fetch("{{ route('presensi.mobile.checkin') }}", {
@@ -706,16 +816,18 @@
                         overallAttendanceSummary.textContent = 'Hadir (Tercatat)';
                         overallAttendanceSummary.className = 'text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200';
 
-                        showToast(`Presensi masuk berhasil dicatat pada ${timeIn} WIB.`);
+                        showToast(`Presensi masuk berhasil dicatat pada ${timeIn} WIB.`, 'success', 'Presensi Berhasil');
                         setTimeout(() => window.location.reload(), 1500);
                     } else {
-                        showToast(data.message || 'Gagal menyimpan presensi masuk.');
+                        btnCheckIn.querySelector('div').innerHTML = originalHtml;
+                        showToast(data.message || 'Gagal menyimpan presensi masuk.', 'error', 'Gagal Presensi');
                         updateActionButtons();
                     }
                 })
                 .catch(err => {
                     console.error(err);
-                    showToast('Gagal menghubungi server presensi.');
+                    btnCheckIn.querySelector('div').innerHTML = originalHtml;
+                    showToast('Gagal menghubungi server presensi.', 'error', 'Koneksi Terputus');
                     updateActionButtons();
                 });
             });
@@ -724,7 +836,16 @@
             btnCheckOut.addEventListener('click', function () {
                 if (!isInsideRadius || !hasCheckedIn || hasCheckedOut || !userCoordinates) return;
 
+                // Disable state & Loading spinner
                 btnCheckOut.disabled = true;
+                const originalHtml = btnCheckOut.querySelector('div').innerHTML;
+                btnCheckOut.querySelector('div').innerHTML = `
+                    <svg class="animate-spin -ml-1 mr-1 h-4 w-4 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span>Mengirim Data...</span>
+                `;
                 btnCheckOutSub.textContent = 'Menyimpan ke server...';
 
                 fetch("{{ route('presensi.mobile.checkout') }}", {
@@ -754,24 +875,44 @@
                         overallAttendanceSummary.textContent = 'Presensi Selesai Lengkap';
                         overallAttendanceSummary.className = 'text-[11px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-200';
 
-                        showToast(`Presensi pulang berhasil dicatat pada ${timeOut} WIB.`);
+                        showToast(`Presensi pulang berhasil dicatat pada ${timeOut} WIB.`, 'success', 'Presensi Berhasil');
                         setTimeout(() => window.location.reload(), 1500);
                     } else {
-                        showToast(data.message || 'Gagal menyimpan presensi pulang.');
+                        btnCheckOut.querySelector('div').innerHTML = originalHtml;
+                        showToast(data.message || 'Gagal menyimpan presensi pulang.', 'error', 'Gagal Presensi');
                         updateActionButtons();
                     }
                 })
                 .catch(err => {
                     console.error(err);
-                    showToast('Gagal menghubungi server presensi.');
+                    btnCheckOut.querySelector('div').innerHTML = originalHtml;
+                    showToast('Gagal menghubungi server presensi.', 'error', 'Koneksi Terputus');
                     updateActionButtons();
                 });
             });
 
-            function showToast(msg) {
+            let toastTimer = null;
+            function showToast(msg, type = 'info', title = 'Pemberitahuan') {
+                if (toastTimer) clearTimeout(toastTimer);
+
+                toastTitle.textContent = title;
                 toastMessage.textContent = msg;
+
+                if (type === 'success') {
+                    toastIconContainer.className = 'w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-400 border border-emerald-400/30 flex items-center justify-center flex-shrink-0';
+                    toastIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />';
+                } else if (type === 'error') {
+                    toastIconContainer.className = 'w-8 h-8 rounded-xl bg-rose-500/20 text-rose-400 border border-rose-400/30 flex items-center justify-center flex-shrink-0';
+                    toastIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />';
+                } else {
+                    toastIconContainer.className = 'w-8 h-8 rounded-xl bg-blue-500/20 text-blue-400 border border-blue-400/30 flex items-center justify-center flex-shrink-0';
+                    toastIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />';
+                }
+
                 actionToast.classList.remove('hidden');
-                setTimeout(() => actionToast.classList.add('hidden'), 5000);
+                toastTimer = setTimeout(() => {
+                    actionToast.classList.add('hidden');
+                }, 4000);
             }
 
             // Inisialisasi awal tombol
