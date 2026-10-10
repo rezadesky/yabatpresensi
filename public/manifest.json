@@ -14,7 +14,13 @@
   "orientation": "portrait",
   "categories": ["business", "productivity", "utilities"],
   "prefer_related_applications": false,
-  "related_applications": [],
+  "related_applications": [
+    {
+      "platform": "play",
+      "url": "https://play.google.com/store/apps/details?id=org.yabat.presensi",
+      "id": "org.yabat.presensi"
+    }
+  ],
   "iarc_rating_id": "e84b072d-71b3-4d3e-86ae-31a8ce4e53b7",
   "launch_handler": {
     "client_mode": "focus-existing"
@@ -45,7 +51,7 @@
   },
   "scope_extensions": [
     {
-      "origin": "https://yabatpresensi.stkip-us.ac.id"
+      "origin": "yabatpresensi.stkip-us.ac.id"
     }
   ],
   "edge_side_panel": {
