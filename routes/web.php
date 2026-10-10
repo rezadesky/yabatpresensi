@@ -24,22 +24,42 @@ Route::get('/login', function () {
 Route::post('/login', [AuthController::class, 'login'])->name('login.post');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
+// Rute Informasi khusus bagi pegawai yang membuka tautan di browser web
+Route::get('/app-notice', function () {
+    return view('mobile_notice');
+})->name('mobile.info');
+
 // ========================================================
 // RUTE TERPROTEKSI (WAJIB LOGIN UNTUK MENGAKSES)
 // ========================================================
 Route::middleware('auth')->group(function () {
-    // Portal Mobile Pegawai YABAT (4 Tabs)
+    // Seluruh rute /mobile di browser dialihkan ke halaman info aplikasi mobile
     Route::prefix('mobile')->name('mobile.')->group(function () {
-        Route::get('/beranda', [AttendanceController::class, 'mobileBeranda'])->name('beranda');
-        Route::get('/presensi', [AttendanceController::class, 'mobile'])->name('presensi');
-        Route::get('/riwayat', [AttendanceController::class, 'mobileRiwayat'])->name('riwayat');
-        Route::get('/profil', [AttendanceController::class, 'mobileProfil'])->name('profil');
+        Route::get('/beranda', function () {
+            if (auth()->user()->role === 'admin') return redirect()->route('admin.dashboard');
+            return redirect()->route('mobile.info');
+        })->name('beranda');
+
+        Route::get('/presensi', function () {
+            if (auth()->user()->role === 'admin') return redirect()->route('admin.dashboard');
+            return redirect()->route('mobile.info');
+        })->name('presensi');
+
+        Route::get('/riwayat', function () {
+            if (auth()->user()->role === 'admin') return redirect()->route('admin.dashboard');
+            return redirect()->route('mobile.info');
+        })->name('riwayat');
+
+        Route::get('/profil', function () {
+            if (auth()->user()->role === 'admin') return redirect()->route('admin.dashboard');
+            return redirect()->route('mobile.info');
+        })->name('profil');
     });
 
-    // Alias & API Endpoint Presensi GPS
-    Route::get('/presensi-mobile', [AttendanceController::class, 'mobile'])->name('presensi.mobile');
-    Route::post('/presensi-mobile/checkin', [AttendanceController::class, 'checkIn'])->name('presensi.mobile.checkin');
-    Route::post('/presensi-mobile/checkout', [AttendanceController::class, 'checkOut'])->name('presensi.mobile.checkout');
+    Route::get('/presensi-mobile', function () {
+        if (auth()->user()->role === 'admin') return redirect()->route('admin.dashboard');
+        return redirect()->route('mobile.info');
+    })->name('presensi.mobile');
 
     // Admin Panel Routes (Hanya untuk Role Admin)
     Route::prefix('admin')->name('admin.')->middleware('admin')->group(function () {

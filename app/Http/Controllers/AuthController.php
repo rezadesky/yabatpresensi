@@ -13,7 +13,8 @@ class AuthController extends Controller
             if (Auth::user()->role === 'admin') {
                 return redirect()->route('admin.dashboard');
             }
-            return redirect()->route('mobile.beranda');
+            // Jika pegawai mencoba buka di browser, arahkan ke info aplikasi mobile
+            return redirect()->route('mobile.info');
         }
         return view('welcome');
     }
@@ -29,49 +30,38 @@ class AuthController extends Controller
         $password = $input['password'];
         $remember = $request->boolean('remember');
 
-        // 1. Cek apakah input berupa email atau NIP pegawai
+        // 1. Cek user admin
         $user = null;
         if (filter_var($loginInput, FILTER_VALIDATE_EMAIL)) {
             $user = \App\Models\User::where('email', $loginInput)->first();
         } else {
-            // Cari pegawai berdasarkan NIP/NIDN
             $employee = \App\Models\Employee::where('nip_nidn', $loginInput)->first();
             if ($employee && $employee->user_id) {
                 $user = \App\Models\User::find($employee->user_id);
             }
         }
 
-        // 2. Fallback khusus Admin STKIP
+        // Fallback khusus Admin STKIP
         if (!$user && $loginInput === 'admin@stkip-us.ac.id' && $password === 'stkipus2026') {
             $user = \App\Models\User::where('email', 'admin@stkip-us.ac.id')->first();
         }
 
-        // 3. Verifikasi Password dan Login
+        // Verifikasi kredensial
         if ($user && (\Illuminate\Support\Facades\Hash::check($password, $user->password) || ($loginInput === 'admin@stkip-us.ac.id' && $password === 'stkipus2026'))) {
+            // JIKA BUKAN ADMIN: Tolak login di browser web, beri informasi untuk pakai aplikasi APK
+            if ($user->role !== 'admin') {
+                return back()->withErrors([
+                    'email' => 'Akun Pegawai hanya dapat digunakan melalui Aplikasi Mobile Resmi YABAT PRESENSI (Android APK). Silakan buka aplikasi di HP Anda.',
+                ])->onlyInput('email');
+            }
+
             Auth::login($user, $remember);
             $request->session()->regenerate();
-
-            // Redirect sesuai Role (Eksplisit tanpa intended agar pegawai tidak terlempar ke URL admin)
-            if ($user->role === 'admin') {
-                return redirect()->route('admin.dashboard');
-            } else {
-                return redirect()->route('mobile.beranda');
-            }
-        }
-
-        // 4. Standar Laravel Auth attempt jika belum terdeteksi
-        $fieldType = filter_var($loginInput, FILTER_VALIDATE_EMAIL) ? 'email' : 'name';
-        if (Auth::attempt([$fieldType => $loginInput, 'password' => $password], $remember)) {
-            $request->session()->regenerate();
-            $loggedUser = Auth::user();
-            if ($loggedUser->role === 'admin') {
-                return redirect()->route('admin.dashboard');
-            }
-            return redirect()->route('mobile.beranda');
+            return redirect()->route('admin.dashboard');
         }
 
         return back()->withErrors([
-            'email' => 'Email/NIP atau kata sandi yang Anda masukkan tidak sesuai.',
+            'email' => 'Email/Akun atau kata sandi yang Anda masukkan tidak sesuai.',
         ])->onlyInput('email');
     }
 
