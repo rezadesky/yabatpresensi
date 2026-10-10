@@ -1,12 +1,17 @@
 import React from 'react';
-import { View, Text, StyleSheet, Image } from 'react-native';
+import { View, Text, StyleSheet, Image, Platform } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { getInitials } from '../utils/helpers';
 
 export default function MobileHeader({ employee }) {
+  const insets = useSafeAreaInsets();
   const initials = getInitials(employee?.name);
 
+  // Dynamic status bar padding: safe area inset + offset
+  const topPadding = Math.max(insets.top, Platform.OS === 'android' ? 24 : 0) + 12;
+
   return (
-    <View style={styles.header}>
+    <View style={[styles.header, { paddingTop: topPadding }]}>
       {/* Decorative Glow Circles */}
       <View style={styles.glowTopRight} />
       <View style={styles.glowBottomLeft} />
