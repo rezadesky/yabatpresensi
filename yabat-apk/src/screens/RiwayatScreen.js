@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -9,6 +9,7 @@ import {
   ActivityIndicator
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useFocusEffect } from '@react-navigation/native';
 import { useAuth } from '../context/AuthContext';
 import MobileHeader from '../components/MobileHeader';
 import api from '../api/client';
@@ -43,9 +44,11 @@ export default function RiwayatScreen() {
     }
   };
 
-  useEffect(() => {
-    fetchRiwayat(period);
-  }, [period]);
+  useFocusEffect(
+    useCallback(() => {
+      fetchRiwayat(period);
+    }, [period])
+  );
 
   const onRefresh = () => {
     setRefreshing(true);
