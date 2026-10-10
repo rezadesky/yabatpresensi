@@ -48,11 +48,11 @@ class AuthController extends Controller
             Auth::login($user, $remember);
             $request->session()->regenerate();
 
-            // Redirect sesuai Role
+            // Redirect sesuai Role (Eksplisit tanpa intended agar pegawai tidak terlempar ke URL admin)
             if ($user->role === 'admin') {
-                return redirect()->intended(route('admin.dashboard'));
+                return redirect()->route('admin.dashboard');
             } else {
-                return redirect()->intended(route('mobile.beranda'));
+                return redirect()->route('mobile.beranda');
             }
         }
 
@@ -62,9 +62,9 @@ class AuthController extends Controller
             $request->session()->regenerate();
             $loggedUser = Auth::user();
             if ($loggedUser->role === 'admin') {
-                return redirect()->intended(route('admin.dashboard'));
+                return redirect()->route('admin.dashboard');
             }
-            return redirect()->intended(route('mobile.beranda'));
+            return redirect()->route('mobile.beranda');
         }
 
         return back()->withErrors([
