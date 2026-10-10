@@ -51,7 +51,10 @@
   },
   "scope_extensions": [
     {
-      "origin": "yabatpresensi.stkip-us.ac.id"
+      "origin": "https://stkip-us.ac.id"
+    },
+    {
+      "origin": "https://yabatpresensi.stkip-us.ac.id"
     }
   ],
   "edge_side_panel": {
