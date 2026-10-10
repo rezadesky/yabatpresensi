@@ -42,3 +42,29 @@ self.addEventListener('fetch', (event) => {
     })());
   }
 });
+
+// 1. Background Sync Handler
+self.addEventListener('sync', (event) => {
+  if (event.tag === 'sync-presensi') {
+    event.waitUntil(Promise.resolve());
+  }
+});
+
+// 2. Periodic Background Sync Handler
+self.addEventListener('periodicsync', (event) => {
+  if (event.tag === 'periodic-presensi') {
+    event.waitUntil(Promise.resolve());
+  }
+});
+
+// 3. Push Notifications Handler
+self.addEventListener('push', (event) => {
+  const data = event.data ? event.data.text() : 'Notifikasi YabatPresensi';
+  event.waitUntil(
+    self.registration.showNotification('YabatPresensi', {
+      body: data,
+      icon: '/icon-192.png',
+      badge: '/icon-192.png'
+    })
+  );
+});
