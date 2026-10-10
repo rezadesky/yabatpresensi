@@ -100,19 +100,44 @@ export default function PresensiScreen() {
         return;
       }
 
-      // 2. Cek apakah layanan GPS aktif di HP
+      // 2. Cek apakah layanan GPS aktif di HP. Jika mati, paksa munculkan dialog aktifkan GPS bawaan Android!
       const isEnabled = await Location.hasServicesEnabledAsync();
       if (!isEnabled) {
-        setGpsError('GPS perangkat sedang tidak aktif. Harap aktifkan GPS / Lokasi perangkat Anda.');
+        try {
+          // Memaksa Android memunculkan popup dialog sistem: "To continue, turn on device location"
+          await Location.enableNetworkProviderAsync();
+        } catch (provErr) {
+          Alert.alert(
+            'GPS Wajib Aktif',
+            'Sistem presensi memerlukan GPS aktif. Harap nyalakan Lokasi / GPS di pengaturan HP Anda.',
+            [{ text: 'Buka Pengaturan', onPress: () => Location.enableNetworkProviderAsync().catch(() => {}) }]
+          );
+          setGpsError('GPS perangkat sedang tidak aktif. Harap aktifkan GPS / Lokasi perangkat Anda.');
+          setCheckingGps(false);
+          return;
+        }
+      }
+
+      // 3. Ambil posisi GPS Native Akurasi Tinggi (dengan fallback balanced)
+      let position;
+      try {
+        position = await Location.getCurrentPositionAsync({
+          accuracy: Location.Accuracy.Highest,
+          mayShowUserSettingsDialog: true,
+          timeInterval: 1000,
+        });
+      } catch (highErr) {
+        // Fallback jika GPS outdoor lambat, coba last known atau balanced
+        position = await Location.getLastKnownPositionAsync() || await Location.getCurrentPositionAsync({
+          accuracy: Location.Accuracy.Balanced,
+        });
+      }
+
+      if (!position || !position.coords) {
+        setGpsError('Gagal memperoleh titik koordinat. Pastikan GPS menyala dan sinyal tersedia.');
         setCheckingGps(false);
         return;
       }
-
-      // 3. Ambil posisi GPS Native Akurasi Tinggi
-      const position = await Location.getCurrentPositionAsync({
-        accuracy: Location.Accuracy.High,
-        mayShowUserSettingsDialog: true,
-      });
 
       const { latitude, longitude, accuracy: posAccuracy } = position.coords;
       setUserCoords({ latitude, longitude });
@@ -133,7 +158,11 @@ export default function PresensiScreen() {
       }
     } catch (err) {
       console.log('GPS error:', err);
-      setGpsError('Gagal mendeteksi sinyal GPS. Pastikan Anda berada di luar ruangan dengan pandangan langit terbuka.');
+      // Jika error karena permission/service, berikan opsi enable
+      try {
+        await Location.enableNetworkProviderAsync();
+      } catch (e) {}
+      setGpsError('Gagal mendeteksi sinyal GPS. Silakan pastikan izin Lokasi sudah "Izinkan Setiap Saat / Saat Aplikasi Digunakan".');
     } finally {
       setCheckingGps(false);
     }
