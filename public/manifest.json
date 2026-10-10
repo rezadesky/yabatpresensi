@@ -1,12 +1,19 @@
 {
-  "name": "YABAT PRESENSI",
-  "short_name": "YABAT PRESENSI",
+  "id": "/?source=pwa",
+  "name": "YabatPresensi",
+  "short_name": "YabatPresensi",
   "description": "Aplikasi Presensi GPS Pegawai Yayasan Anak Bangsa Aceh Tenggara",
+  "lang": "id",
+  "dir": "ltr",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
+  "display_override": ["standalone", "window-controls-overlay", "browser"],
   "background_color": "#ffffff",
   "theme_color": "#1e40af",
   "orientation": "portrait",
+  "categories": ["business", "productivity", "utilities"],
+  "prefer_related_applications": false,
   "icons": [
     {
       "src": "/icon-192.png",
@@ -19,6 +26,38 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Presensi GPS",
+      "short_name": "Presensi",
+      "description": "Buka halaman presensi masuk dan pulang",
+      "url": "/mobile/presensi",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Riwayat Presensi",
+      "short_name": "Riwayat",
+      "description": "Lihat rekapitulasi kehadiran",
+      "url": "/mobile/riwayat",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshot-narrow.png",
+      "sizes": "720x1280",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Tampilan Mobile Presensi"
+    },
+    {
+      "src": "/screenshot-wide.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Tampilan Desktop Dashboard"
     }
   ]
 }
