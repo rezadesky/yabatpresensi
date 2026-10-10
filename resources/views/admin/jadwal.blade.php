@@ -101,13 +101,29 @@
     </div>
 
     <!-- Modal Tambah Shift -->
-    <div x-show="openCreateModal" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
+    <div x-show="openCreateModal" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm"
+         x-data="{
+             selectedDays: ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'],
+             allDays: ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'],
+             toggleDay(day) {
+                 if (this.selectedDays.includes(day)) {
+                     this.selectedDays = this.selectedDays.filter(d => d !== day);
+                 } else {
+                     this.selectedDays.push(day);
+                 }
+             },
+             setPreset(type) {
+                 if (type === 'senin-sabtu') this.selectedDays = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+                 if (type === 'senin-jumat') this.selectedDays = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat'];
+                 if (type === 'semua') this.selectedDays = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
+             }
+         }">
         <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto" @click.away="openCreateModal = false">
             <div class="flex items-center justify-between border-b pb-3">
                 <h3 class="text-base font-bold text-slate-900">Tambah Shift Kerja Baru</h3>
                 <button type="button" @click="openCreateModal = false" class="text-slate-400 hover:text-slate-600">&times;</button>
             </div>
-            <form method="POST" action="{{ route('admin.jadwal.store') }}" class="space-y-3.5 text-xs">
+            <form method="POST" action="{{ route('admin.jadwal.store') }}" class="space-y-4 text-xs">
                 @csrf
                 <div>
                     <label class="block font-semibold text-slate-700 mb-1">Nama Shift *</label>
@@ -122,10 +138,40 @@
                         @endforeach
                     </select>
                 </div>
+
+                <!-- Pemilih Hari Kerja Interaktif (Senin - Minggu) -->
                 <div>
-                    <label class="block font-semibold text-slate-700 mb-1">Hari Kerja *</label>
-                    <input type="text" name="day_of_week" required placeholder="Senin - Sabtu / Setiap Hari" class="w-full px-3 py-2 border rounded-lg">
+                    <div class="flex items-center justify-between mb-1.5">
+                        <label class="block font-semibold text-slate-700">Pilih Hari Kerja Aktif *</label>
+                        <div class="flex gap-1 text-[10px]">
+                            <button type="button" @click="setPreset('senin-jumat')" class="px-2 py-0.5 rounded bg-slate-100 hover:bg-slate-200 text-slate-600 font-medium">Sen-Jum</button>
+                            <button type="button" @click="setPreset('senin-sabtu')" class="px-2 py-0.5 rounded bg-blue-50 hover:bg-blue-100 text-blue-700 font-semibold">Sen-Sab</button>
+                            <button type="button" @click="setPreset('semua')" class="px-2 py-0.5 rounded bg-slate-100 hover:bg-slate-200 text-slate-600 font-medium">Semua</button>
+                        </div>
+                    </div>
+
+                    <!-- Hidden input to submit combined string -->
+                    <input type="hidden" name="day_of_week" :value="selectedDays.join(', ')" required>
+
+                    <!-- Pilihan Tombol Pill Hari -->
+                    <div class="grid grid-cols-4 sm:grid-cols-7 gap-1.5">
+                        <template x-for="day in allDays" :key="day">
+                            <button 
+                                type="button"
+                                @click="toggleDay(day)"
+                                :class="selectedDays.includes(day) 
+                                    ? 'bg-blue-600 text-white border-blue-600 shadow-sm font-bold' 
+                                    : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100 font-medium'"
+                                class="py-2 px-1 text-center rounded-xl border text-[11px] transition duration-150 flex flex-col items-center justify-center gap-0.5"
+                            >
+                                <span x-text="day"></span>
+                                <span class="w-1.5 h-1.5 rounded-full" :class="selectedDays.includes(day) ? 'bg-white' : 'bg-transparent'"></span>
+                            </button>
+                        </template>
+                    </div>
+                    <p class="text-[10px] text-slate-400 mt-1">Hari terpilih: <span class="font-semibold text-slate-700" x-text="selectedDays.length ? selectedDays.join(', ') : 'Belum ada hari yang dipilih'"></span></p>
                 </div>
+
                 <div class="grid grid-cols-3 gap-3">
                     <div>
                         <label class="block font-semibold text-slate-700 mb-1">Jam Masuk *</label>
@@ -142,20 +188,41 @@
                 </div>
                 <div class="flex justify-end gap-2 pt-3 border-t">
                     <button type="button" @click="openCreateModal = false" class="px-4 py-2 border rounded-lg text-slate-600 hover:bg-slate-50">Batal</button>
-                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold">Simpan Shift</button>
+                    <button type="submit" :disabled="selectedDays.length === 0" class="px-4 py-2 bg-blue-600 disabled:opacity-50 text-white rounded-lg hover:bg-blue-700 font-semibold">Simpan Shift</button>
                 </div>
             </form>
         </div>
     </div>
 
     <!-- Modal Edit Shift -->
-    <div x-show="openEditModal" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
+    <div x-show="openEditModal" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm"
+         x-data="{
+             allDays: ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'],
+             getEditDays() {
+                 if (!editData.day_of_week) return [];
+                 return editData.day_of_week.split(',').map(s => s.trim());
+             },
+             toggleEditDay(day) {
+                 let current = this.getEditDays();
+                 if (current.includes(day)) {
+                     current = current.filter(d => d !== day);
+                 } else {
+                     current.push(day);
+                 }
+                 editData.day_of_week = current.join(', ');
+             },
+             setEditPreset(type) {
+                 if (type === 'senin-sabtu') editData.day_of_week = 'Senin, Selasa, Rabu, Kamis, Jumat, Sabtu';
+                 if (type === 'senin-jumat') editData.day_of_week = 'Senin, Selasa, Rabu, Kamis, Jumat';
+                 if (type === 'semua') editData.day_of_week = 'Senin, Selasa, Rabu, Kamis, Jumat, Sabtu, Minggu';
+             }
+         }">
         <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto" @click.away="openEditModal = false">
             <div class="flex items-center justify-between border-b pb-3">
                 <h3 class="text-base font-bold text-slate-900">Ubah Shift Kerja</h3>
                 <button type="button" @click="openEditModal = false" class="text-slate-400 hover:text-slate-600">&times;</button>
             </div>
-            <form :action="'{{ url('/admin/jadwal') }}/' + editData.id" method="POST" class="space-y-3.5 text-xs">
+            <form :action="'{{ url('/admin/jadwal') }}/' + editData.id" method="POST" class="space-y-4 text-xs">
                 @csrf
                 @method('PUT')
                 <div>
@@ -171,10 +238,38 @@
                         @endforeach
                     </select>
                 </div>
+
+                <!-- Pemilih Hari Kerja Interaktif Edit -->
                 <div>
-                    <label class="block font-semibold text-slate-700 mb-1">Hari Kerja *</label>
-                    <input type="text" name="day_of_week" x-model="editData.day_of_week" required class="w-full px-3 py-2 border rounded-lg">
+                    <div class="flex items-center justify-between mb-1.5">
+                        <label class="block font-semibold text-slate-700">Pilih Hari Kerja Aktif *</label>
+                        <div class="flex gap-1 text-[10px]">
+                            <button type="button" @click="setEditPreset('senin-jumat')" class="px-2 py-0.5 rounded bg-slate-100 hover:bg-slate-200 text-slate-600 font-medium">Sen-Jum</button>
+                            <button type="button" @click="setEditPreset('senin-sabtu')" class="px-2 py-0.5 rounded bg-blue-50 hover:bg-blue-100 text-blue-700 font-semibold">Sen-Sab</button>
+                            <button type="button" @click="setEditPreset('semua')" class="px-2 py-0.5 rounded bg-slate-100 hover:bg-slate-200 text-slate-600 font-medium">Semua</button>
+                        </div>
+                    </div>
+
+                    <input type="hidden" name="day_of_week" :value="editData.day_of_week" required>
+
+                    <div class="grid grid-cols-4 sm:grid-cols-7 gap-1.5">
+                        <template x-for="day in allDays" :key="day">
+                            <button 
+                                type="button"
+                                @click="toggleEditDay(day)"
+                                :class="getEditDays().includes(day) 
+                                    ? 'bg-blue-600 text-white border-blue-600 shadow-sm font-bold' 
+                                    : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100 font-medium'"
+                                class="py-2 px-1 text-center rounded-xl border text-[11px] transition duration-150 flex flex-col items-center justify-center gap-0.5"
+                            >
+                                <span x-text="day"></span>
+                                <span class="w-1.5 h-1.5 rounded-full" :class="getEditDays().includes(day) ? 'bg-white' : 'bg-transparent'"></span>
+                            </button>
+                        </template>
+                    </div>
+                    <p class="text-[10px] text-slate-400 mt-1">Hari terpilih: <span class="font-semibold text-slate-700" x-text="editData.day_of_week || 'Belum ada hari yang dipilih'"></span></p>
                 </div>
+
                 <div class="grid grid-cols-3 gap-3">
                     <div>
                         <label class="block font-semibold text-slate-700 mb-1">Jam Masuk *</label>

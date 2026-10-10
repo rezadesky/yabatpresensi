@@ -23,11 +23,15 @@ class WorkScheduleController extends Controller
         $validated = $request->validate([
             'institution_id' => 'nullable|exists:institutions,id',
             'name' => 'required|string|max:255',
-            'day_of_week' => 'required|string|max:100',
-            'time_in' => 'required|date_format:H:i',
-            'time_out' => 'required|date_format:H:i',
+            'day_of_week' => 'required',
+            'time_in' => 'required',
+            'time_out' => 'required',
             'late_tolerance_minutes' => 'required|integer|min:0',
         ]);
+
+        if (is_array($validated['day_of_week'])) {
+            $validated['day_of_week'] = implode(', ', $validated['day_of_week']);
+        }
 
         WorkSchedule::create($validated);
 
@@ -41,11 +45,15 @@ class WorkScheduleController extends Controller
         $validated = $request->validate([
             'institution_id' => 'nullable|exists:institutions,id',
             'name' => 'required|string|max:255',
-            'day_of_week' => 'required|string|max:100',
-            'time_in' => 'required|date_format:H:i',
-            'time_out' => 'required|date_format:H:i',
+            'day_of_week' => 'required',
+            'time_in' => 'required',
+            'time_out' => 'required',
             'late_tolerance_minutes' => 'required|integer|min:0',
         ]);
+
+        if (is_array($validated['day_of_week'])) {
+            $validated['day_of_week'] = implode(', ', $validated['day_of_week']);
+        }
 
         $schedule->update($validated);
 
