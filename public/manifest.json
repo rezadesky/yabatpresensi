@@ -14,6 +14,70 @@
   "orientation": "portrait",
   "categories": ["business", "productivity", "utilities"],
   "prefer_related_applications": false,
+  "related_applications": [],
+  "iarc_rating_id": "e84b072d-71b3-4d3e-86ae-31a8ce4e53b7",
+  "launch_handler": {
+    "client_mode": "focus-existing"
+  },
+  "file_handlers": [
+    {
+      "action": "/mobile/presensi",
+      "name": "File Presensi",
+      "accept": {
+        "text/plain": [".txt"]
+      }
+    }
+  ],
+  "protocol_handlers": [
+    {
+      "protocol": "web+presensi",
+      "url": "/mobile/presensi?action=%s"
+    }
+  ],
+  "share_target": {
+    "action": "/mobile/presensi",
+    "method": "GET",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  },
+  "scope_extensions": [
+    {
+      "origin": "https://yabatpresensi.stkip-us.ac.id"
+    }
+  ],
+  "edge_side_panel": {
+    "preferred_width": 480
+  },
+  "widgets": [
+    {
+      "name": "Presensi Cepat",
+      "description": "Widget presensi GPS langsung dari layar utama",
+      "tag": "presensi-widget",
+      "template": "widget",
+      "ms_ac_template": "widget.json",
+      "data": "widget.json",
+      "type": "application/json",
+      "screenshots": [
+        {
+          "src": "/screenshot-narrow.png",
+          "sizes": "720x1280",
+          "label": "Tampilan Widget Presensi"
+        }
+      ],
+      "icons": [
+        {
+          "src": "/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ],
+  "note_taking": {
+    "new_note_url": "/mobile/presensi"
+  },
   "icons": [
     {
       "src": "/icon-192.png",
