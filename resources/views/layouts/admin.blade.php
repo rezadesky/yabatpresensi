@@ -6,8 +6,8 @@
     <meta name="theme-color" content="#0f172a">
     <title>@yield('title', 'YABAT PRESENSI | Portal Presensi Yayasan Anak Bangsa Aceh Tenggara')</title>
 
-    <link rel="icon" type="image/webp" href="{{ asset('logo.webp') }}">
-    <link rel="apple-touch-icon" href="{{ asset('logo.webp') }}">
+    <link rel="icon" type="image/png" href="{{ asset('logo.png') }}">
+    <link rel="apple-touch-icon" href="{{ asset('logo.png') }}">
     <link rel="manifest" href="/manifest.json">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -35,7 +35,7 @@
             <!-- Sidebar Header / Brand -->
             <div class="h-14 flex items-center justify-between px-5 border-b border-slate-800/80 bg-slate-950/40">
                 <div class="flex items-center gap-2.5">
-                    <img src="{{ asset('logo.webp') }}" alt="Logo YABAT" class="w-8 h-8 object-contain">
+                    <img src="{{ asset('logo.png') }}" alt="Logo YABAT" class="w-8 h-8 object-contain">
                     <div>
                         <div class="font-bold text-[13px] tracking-wider text-white">YABAT PRESENSI</div>
                         <div class="text-[10px] text-slate-400 font-medium">Admin Yayasan</div>

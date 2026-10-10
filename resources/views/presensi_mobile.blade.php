@@ -7,8 +7,8 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Presensi Mobile GPS | YABAT Attendance</title>
 
-    <link rel="icon" type="image/webp" href="{{ asset('logo.webp') }}">
-    <link rel="apple-touch-icon" href="{{ asset('logo.webp') }}">
+    <link rel="icon" type="image/png" href="{{ asset('logo.png') }}">
+    <link rel="apple-touch-icon" href="{{ asset('logo.png') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
@@ -45,7 +45,7 @@
                 <!-- Brand Bar -->
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-2.5">
-                        <img src="{{ asset('logo.webp') }}" alt="Logo YABAT" class="w-8 h-8 object-contain drop-shadow">
+                        <img src="{{ asset('logo.png') }}" alt="Logo YABAT" class="w-8 h-8 object-contain drop-shadow">
                         <div>
                             <span class="text-xs font-bold tracking-wider text-white uppercase block leading-tight">YABAT ATTENDANCE</span>
                             <span class="text-[10px] text-blue-300 font-medium">Aceh Tenggara &bull; GPS Geofencing</span>

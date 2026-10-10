@@ -6,8 +6,8 @@
     <meta name="theme-color" content="#ffffff">
     <title>YABAT PRESENSI | Portal Presensi Yayasan Anak Bangsa Aceh Tenggara</title>
     
-    <link rel="icon" type="image/webp" href="{{ asset('logo.webp') }}">
-    <link rel="apple-touch-icon" href="{{ asset('logo.webp') }}">
+    <link rel="icon" type="image/png" href="{{ asset('logo.png') }}">
+    <link rel="apple-touch-icon" href="{{ asset('logo.png') }}">
     <link rel="manifest" href="/manifest.json">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -38,7 +38,7 @@
             <div class="text-center mb-8">
                 <div class="inline-flex items-center justify-center mb-4">
                     <img 
-                        src="{{ asset('logo.webp') }}" 
+                        src="{{ asset('logo.png') }}" 
                         alt="Logo Yayasan Anak Bangsa" 
                         class="w-20 h-20 sm:w-24 sm:h-24 object-contain"
                     >

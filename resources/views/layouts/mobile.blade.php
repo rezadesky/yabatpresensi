@@ -7,8 +7,8 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'YABAT Mobile | Portal Presensi Pegawai')</title>
 
-    <link rel="icon" type="image/webp" href="{{ asset('logo.webp') }}">
-    <link rel="apple-touch-icon" href="{{ asset('logo.webp') }}">
+    <link rel="icon" type="image/png" href="{{ asset('logo.png') }}">
+    <link rel="apple-touch-icon" href="{{ asset('logo.png') }}">
     <link rel="manifest" href="/manifest.json">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -52,7 +52,7 @@
             <div class="relative z-10 space-y-3.5">
                 <!-- Brand Header -->
                 <div class="flex items-center gap-3">
-                    <img src="{{ asset('logo.webp') }}" alt="Logo YABAT" class="w-9 h-9 object-contain drop-shadow flex-shrink-0">
+                    <img src="{{ asset('logo.png') }}" alt="Logo YABAT" class="w-9 h-9 object-contain drop-shadow flex-shrink-0">
                     <div class="min-w-0">
                         <span class="text-sm font-extrabold tracking-wider text-white uppercase block leading-tight">YABAT PRESENSI</span>
                         <span class="text-[10px] text-blue-300 font-medium block leading-normal mt-0.5">Portal Presensi Yayasan Anak Bangsa Aceh Tenggara</span>
